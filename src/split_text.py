@@ -3,7 +3,7 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-05 03:22:14 trottar"
+# Time-stamp: "2023-03-05 03:25:53 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -132,8 +132,6 @@ for i, chunk in enumerate(chunks):
     
 prompt_request = "Consoloidate these summaries: " + str(prompt_response)
 
-print("\n\nprompt_request",prompt_request)
-
 response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt_request,
@@ -145,11 +143,8 @@ response = openai.Completion.create(
     )
 
 quick_summary = response["choices"][0]["text"].strip()
-print(quick_summary)
 
 title_request = "Can you give this summary a title: " + str(prompt_response)
-
-print("\n\ntitle_request", title_request)
 
 response = openai.Completion.create(
         model="text-davinci-003",
@@ -162,19 +157,19 @@ response = openai.Completion.create(
     )
 
 title = response["choices"][0]["text"].strip()
-print(title)
 
 out_f = inp_f.replace('../text_files/','../summaries/summary_').replace('.txt','.md')
 
 # write summary to file
 with open(out_f, "w") as f:
-    f.write("# "+"**<u>"+title+"</u>**")
-    f.write("<br>---<br>")
+    f.write("# "+"<b>"+title+"</b>")
+    f.write("<br><br>---<br><br>")
     f.write(quick_summary)
-    f.write("<br>---<br>")
+    f.write("<br><br>---<br><br>")
     for bullet in prompt_response:
         f.write("<br>* "+bullet)
-
+        
+print(f"Finished writing '{title}' to {out_f}.")
 
 
     
