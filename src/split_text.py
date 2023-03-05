@@ -3,14 +3,13 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-05 03:43:27 trottar"
+# Time-stamp: "2023-03-05 03:46:28 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
 #
 # Copyright (c) trottar
 #
-import time
 import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
@@ -167,7 +166,7 @@ with open(out_f, "w") as f:
     f.write(quick_summary)
     f.write("\n<br><br><hr><br><br>\n")
     for bullet in prompt_response:
-        f.write("<li> "+bullet+" </li>")
+        f.write("\n<li> "+bullet+" </li>\n")
     f.write("\n</ul>\n")            
 print(f"\n\n\nFinished writing '{title}' to {out_f}.")
 
