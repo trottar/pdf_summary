@@ -3,7 +3,7 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-05 03:12:55 trottar"
+# Time-stamp: "2023-03-05 03:22:14 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -26,6 +26,11 @@ summary_length = 600
 
 # define the length of each chunk (in tokens)
 chunk_length = 1500
+
+print(f'''\n
+Number of words per summary: {summary_length}
+Limit of {chunk_length} tokens per submission.
+\n''')
 
 def progressBar(value, endvalue, bar_length=50):
     '''
@@ -163,7 +168,7 @@ out_f = inp_f.replace('../text_files/','../summaries/summary_').replace('.txt','
 
 # write summary to file
 with open(out_f, "w") as f:
-    f.write("#"+"**<u>"+title+"</u>**")
+    f.write("# "+"**<u>"+title+"</u>**")
     f.write("<br>---<br>")
     f.write(quick_summary)
     f.write("<br>---<br>")
