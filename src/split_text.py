@@ -3,7 +3,7 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-05 03:36:06 trottar"
+# Time-stamp: "2023-03-05 03:39:59 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -163,9 +163,9 @@ out_f = inp_f.replace('../text_files/','../summaries/summary_').replace('.txt','
 # write summary to file
 with open(out_f, "w") as f:
     f.write("# "+"<b>"+title+"</b>")
-    f.write("<br><br><hr><br><br>")
+    f.write("\n<br><br><hr><br><br>\n")
     f.write(quick_summary)
-    f.write("<br><br><hr><br><br>")
+    f.write("\n<br><br><hr><br><br>\n")
     for bullet in prompt_response:
         f.write("<br><br>* "+bullet)
         
