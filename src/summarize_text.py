@@ -3,7 +3,7 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-06 19:29:53 trottar"
+# Time-stamp: "2023-03-07 00:26:21 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -20,10 +20,10 @@ import os, sys
 openai.api_key = os.getenv('OPENAI_KEY')
 
 # define the length of the summary (in words)
-summary_length = 600
+summary_length = 300
 
 # define the length of each chunk (in tokens)
-chunk_length = 1500
+chunk_length = 1200
 
 print(f'''\n
 Number of words per summary: {summary_length}
@@ -134,9 +134,11 @@ def summarize(inp_f, item_key, collection_key, zotero):
         else:
             progressBar(i, len(chunks)-1, bar_length=25)
 
-        prompt_request = "Summarize this: " + convert_to_detokenized_text(chunk)
+        prompt_request = "Summarize this scientific article: " + convert_to_detokenized_text(chunk)
 
-        messages = [{"role": "system", "content": "This is text summarization."}]
+        system_request = "I want you to act as a professor in the area of high to medium energy nuclear physics at Jefferson Lab. I want you to summarize content on articles in scientific detail. I want you to make sure to include dates and write out any acronyms."
+        
+        messages = [{"role": "system", "content": convert_to_detokenized_text(system_request)}]
         messages.append({"role": "user", "content": prompt_request})
 
         response = openai.ChatCompletion.create(
@@ -157,7 +159,7 @@ def summarize(inp_f, item_key, collection_key, zotero):
             model="text-davinci-003",
             prompt=prompt_request,
             temperature=.5,
-            max_tokens=1000,
+            max_tokens=300,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0
@@ -171,7 +173,7 @@ def summarize(inp_f, item_key, collection_key, zotero):
             model="text-davinci-003",
             prompt=title_request,
             temperature=.5,
-            max_tokens=1000,
+            max_tokens=300,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0
