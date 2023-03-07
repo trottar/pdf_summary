@@ -3,7 +3,7 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-06 04:55:49 trottar"
+# Time-stamp: "2023-03-06 19:29:53 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -14,6 +14,7 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 import openai
+import subprocess
 import os, sys
 
 openai.api_key = os.getenv('OPENAI_KEY')
@@ -78,6 +79,19 @@ def convert_to_detokenized_text(tokenized_text):
     prompt_text = prompt_text.replace(" 's", "'s")
     return prompt_text
 
+def md_to_pdf(filename):
+    
+    filename_pdf = filename.replace('.md','.pdf')
+    
+    if os.path.exists("../summaries/"+filename_pdf):
+        print(f"File {filename_pdf} already exists...")
+        return "../summaries/"+filename_pdf
+    
+    cmd = f"cd ../summaries; pandoc --pdf-engine=xelatex {filename} -o {filename_pdf}"
+    subprocess.check_output(cmd, shell=True).decode()
+
+    return "../summaries/"+filename_pdf
+
 def summarize(inp_f, item_key, collection_key, zotero):
 
     out_f = inp_f.replace('../text_files/','../summaries/summary_').replace('.txt','.md')
@@ -97,7 +111,7 @@ def summarize(inp_f, item_key, collection_key, zotero):
     '''
     prompt_response = []
     for i, chunk in enumerate(chunks):
-        prompt_request = "Summarize this meeting transcript: " + convert_to_detokenized_text(chunks[i])
+        prompt_request = "Summarize this: " + convert_to_detokenized_text(chunks[i])
         response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=prompt_request,
@@ -120,9 +134,9 @@ def summarize(inp_f, item_key, collection_key, zotero):
         else:
             progressBar(i, len(chunks)-1, bar_length=25)
 
-        prompt_request = "Summarize this meeting transcript: " + convert_to_detokenized_text(chunk)
+        prompt_request = "Summarize this: " + convert_to_detokenized_text(chunk)
 
-        messages = [{"role": "system", "content": "This is text summarization."}]    
+        messages = [{"role": "system", "content": "This is text summarization."}]
         messages.append({"role": "user", "content": prompt_request})
 
         response = openai.ChatCompletion.create(
@@ -165,23 +179,27 @@ def summarize(inp_f, item_key, collection_key, zotero):
 
     title = response["choices"][0]["text"].strip()
     
-    template = zotero.item_template('document')
-    template['title'] = title
+    #template = zotero.item_template('document')
+    #template['title'] = title
     #newitem = zotero.create_items([template], collection_key)
-    newitem = zotero.create_items([template])
+    #newitem = zotero.create_items([template])
     
     # write summary to file
     with open(out_f, "w") as f:
-        f.write("# "+"<b>"+title+"</b>")
-        f.write("\n<br><br><hr><br><br>\n")
-        f.write(quick_summary)
-        f.write("\n<br><br><hr><br><br>\n")
+        f.write("#  "+title+"\n\n")
+        f.write("\n## "+"Quick Summary\n\n")
+        f.write("\n"+quick_summary+"\n\n")
+        f.write("\n## "+"Full Summary\n\n")
         for bullet in prompt_response:
-            f.write("\n<br><li> "+bullet+" </li><br>\n")
-        f.write("\n</ul>\n")
+            f.write("\n* "+bullet+"\n")
 
-    zotero.attachment_simple([out_f], newitem['successful']['0']['key'])
+    out_md = out_f.split('summaries/')[1]
+        
+    # convert the markdown file to PDF
+    out_pdf = md_to_pdf(out_md)
+
+    zotero.attachment_simple([out_pdf])
     
-    print(f"\n\n\nFinished writing '{title}' to {out_f}.")
+    print(f"\n\n\nFinished writing '{title}' to {out_pdf}.")
 
     return out_f
