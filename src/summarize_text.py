@@ -3,7 +3,7 @@
 #
 # Description: https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32
 # ================================================================
-# Time-stamp: "2023-03-07 00:26:21 trottar"
+# Time-stamp: "2023-03-17 14:07:42 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -92,7 +92,7 @@ def md_to_pdf(filename):
 
     return "../summaries/"+filename_pdf
 
-def summarize(inp_f, item_key, collection_key, zotero):
+def summarize(inp_f, item_key=None, collection_key=None, zotero=None, inp_prompt="jlab"):
 
     out_f = inp_f.replace('../text_files/','../summaries/summary_').replace('.txt','.md')
     
@@ -136,7 +136,13 @@ def summarize(inp_f, item_key, collection_key, zotero):
 
         prompt_request = "Summarize this scientific article: " + convert_to_detokenized_text(chunk)
 
-        system_request = "I want you to act as a professor in the area of high to medium energy nuclear physics at Jefferson Lab. I want you to summarize content on articles in scientific detail. I want you to make sure to include dates and write out any acronyms."
+        promptDict = {
+
+            "jlab" : "I want you to act as a professor in the area of high to medium energy nuclear physics at Jefferson Lab. I want you to summarize content on articles in scientific detail. I want you to make sure to include dates and write out any acronyms.",
+            "general" : "I want you to summarize content on articles in detail. I want you to make sure to include dates and write out any acronyms."            
+        }
+        
+        system_request = promptDict[inp_prompt]
         
         messages = [{"role": "system", "content": convert_to_detokenized_text(system_request)}]
         messages.append({"role": "user", "content": prompt_request})
@@ -180,12 +186,7 @@ def summarize(inp_f, item_key, collection_key, zotero):
         )
 
     title = response["choices"][0]["text"].strip()
-    
-    #template = zotero.item_template('document')
-    #template['title'] = title
-    #newitem = zotero.create_items([template], collection_key)
-    #newitem = zotero.create_items([template])
-    
+        
     # write summary to file
     with open(out_f, "w") as f:
         f.write("#  "+title+"\n\n")
@@ -195,13 +196,15 @@ def summarize(inp_f, item_key, collection_key, zotero):
         for bullet in prompt_response:
             f.write("\n* "+bullet+"\n")
 
-    out_md = out_f.split('summaries/')[1]
-        
-    # convert the markdown file to PDF
-    out_pdf = md_to_pdf(out_md)
+    if zotero == None:
+            
+        out_md = out_f.split('summaries/')[1]
 
-    zotero.attachment_simple([out_pdf])
-    
-    print(f"\n\n\nFinished writing '{title}' to {out_pdf}.")
+        # convert the markdown file to PDF
+        out_pdf = md_to_pdf(out_md)
+
+        zotero.attachment_simple([out_pdf])
+
+        print(f"\n\n\nFinished writing '{title}' to {out_pdf}.")
 
     return out_f

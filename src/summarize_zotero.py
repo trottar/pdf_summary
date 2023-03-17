@@ -3,7 +3,7 @@
 #
 # Description:
 # ================================================================
-# Time-stamp: "2023-03-06 04:40:42 trottar"
+# Time-stamp: "2023-03-17 14:24:45 trottar"
 # ================================================================
 #
 # Author:  Richard L. Trotta III <trotta@cua.edu>
@@ -23,19 +23,7 @@ library_id = os.getenv('ZOTERO_ID')
 library_type = 'user'
 
 from summarize_text import summarize
-
-def pdf_to_text(filename):
-    
-    filename_txt = filename.replace('.pdf','.txt')
-    
-    if os.path.exists("../text_files/"+filename_txt):
-        print(f"File {filename_txt} already exists...")
-        return filename_txt
-    
-    cmd = f"cd ../text_files; pdftotext -layout {filename} {filename_txt}"
-    subprocess.check_output(cmd, shell=True).decode()
-
-    return filename_txt
+from pdf_to_text import pdf_to_text
     
 zot = zotero.Zotero(library_id, library_type, api_key)
 collections = zot.collections_top() # Returns a library’s top-level collections.
